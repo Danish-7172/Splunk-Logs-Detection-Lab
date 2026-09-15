@@ -1,118 +1,103 @@
-🔐 Brute Force Log Detection Lab (DVWA + Burp Suite + Splunk)
+🔐 Brute Force Attack Detection Lab (DVWA + Burp Suite + Splunk)
 📌 Overview
 
-This project demonstrates a basic cybersecurity detection workflow, where a brute force attack is simulated on a vulnerable web application and identified through log analysis.
+This lab demonstrates a practical brute force attack simulation and log-based detection workflow. It focuses on capturing web authentication attacks and identifying them through log analysis using a SIEM.
 
-The focus of this lab is:
+The lab bridges both:
 
-👉 Capturing attack traffic and detecting it in logs using a SIEM
-
+⚔️ Offensive Security (attack simulation)
+🛡️ Defensive Security (log detection)
 🎯 Objectives
-Simulate a brute force attack on a login page
+Simulate a brute force attack on a web application
 Capture HTTP requests using Burp Suite
-Generate server-side logs
+Generate server logs from attack activity
 Forward logs to Splunk
-Identify attack patterns through log analysis
-🧰 Tools & Technologies
-Burp Suite – Intercepting proxy & attack execution
-Splunk – Log ingestion and analysis
-DVWA (Damn Vulnerable Web Application) – Target application
-Splunk Universal Forwarder – Log forwarding
-Docker – Application deployment
-🏗️ Lab Architecture
-Burp Browser
-   ↓
-Burp Suite (Proxy)
-   ↓
-DVWA (Web Application)
-   ↓
-Web Server Logs
-   ↓
-Splunk Forwarder
-   ↓
-Splunk SIEM
-⚙️ Setup Summary
+Identify brute force patterns through log analysis
+🧰 Tools Used
+Burp Suite
+Splunk
+Splunk Universal Forwarder
+DVWA (Damn Vulnerable Web Application)
+Docker
+🖥️ Lab Setup
+Component	Role
+Kali Linux	Attacker
+DVWA (Docker)	Target
+Splunk	Log Analysis
+Forwarder	Log Sender
+⚔️ Part 1: Attack Simulation
+🔹 Step 1: Access Target
 
-⚠️ Sensitive details (IP addresses, file paths, system identifiers) are intentionally omitted.
+Open DVWA login page:
 
-DVWA deployed in a controlled lab environment
-Logs exposed for monitoring
-Splunk configured for log ingestion
-Forwarder configured to send logs
-Burp Suite used with built-in browser
-⚔️ Attack Simulation (Brute Force)
-🔹 Step 1 — Access Target
-Open DVWA login page
-Use Burp built-in browser
-🔹 Step 2 — Capture Request
-Enable intercept in Burp
-Capture login request:
+http://localhost:8080/login.php
+🔹 Step 2: Intercept Request
+Open Burp built-in browser
+Turn Intercept ON
+Capture request:
 POST /login.php
-🔹 Step 3 — Perform Attack
-Send request to Intruder
-Select password field
-Use a wordlist to perform brute force
-🔁 Observed Behavior
-Multiple login attempts generated
-Same endpoint repeatedly targeted
-High-frequency request pattern
-📂 Log Generation
+🔹 Step 3: Send to Intruder
+Right click → Send to Intruder
+Select password field as payload position
+🔹 Step 4: Launch Brute Force
+Attack type: Sniper
+Use wordlist
+Start attack
+💥 Attack Behavior
+Multiple login attempts
+Same endpoint targeted repeatedly
+High-frequency requests
+📂 Part 2: Log Generation
+🔍 Server Logs
 
-During the attack, the server logs recorded:
+Attack generates logs like:
 
-Repeated POST /login.php requests
-High number of authentication attempts
-Consistent access patterns
-🔍 Log Detection in Splunk
-Basic Search
+POST /login.php
+POST /login.php
+POST /login.php
+📌 Observations
+Repeated authentication attempts
+Same request pattern
+Rapid request generation
+🔐 Part 3: Log Detection (Splunk)
+🔍 Basic Search
 index=* "POST /login.php"
-Identify Repeated Attempts
+🔎 Identify Attack Source
 index=* "POST /login.php"
 | stats count by clientip
-Detection Pattern
-High number of requests from a single source
-Rapid sequence of login attempts
+🚨 Detection Pattern
+High number of requests from one source
+Abnormal frequency of login attempts
+🧠 Observation
+Normal user → few requests
+Attacker → many rapid requests
 
-👉 This behavior indicates a brute force attack
+👉 This clearly indicates a brute force attack
 
-🧠 Key Findings
-Brute force attacks can be identified through log patterns
-Even without alerts, abnormal behavior is visible in SIEM
-Repeated authentication attempts are a strong indicator
-⚠️ Limitations
-
-This project includes:
-
-✔ Attack simulation
-✔ Log ingestion
-✔ Log analysis
-
-It does NOT include:
-
-❌ Automated alerting
-❌ Dashboards
-❌ Active blocking/response
-🛡️ Suggested Improvements
-Implement alert rules in Splunk
-Add time-based detection logic
-Build dashboards for visualization
-Apply rate limiting on login endpoint
-🧾 Conclusion
-
-This project demonstrates how a brute force attack:
-
-Can be simulated using Burp Suite
-Generates identifiable log patterns
-Can be detected using Splunk
-
-It provides a strong foundation for SOC analysis and detection workflows.
-
-🚀 Skills Gained
-Web request interception
-Brute force attack simulation
-Log analysis
-SIEM usage
-Understanding attack behavior
-⚠️ Disclaimer
-
-This project was conducted in a controlled lab environment for educational purposes only.
+🛡️ Defender’s Perspective
+🚨 Brute Force Pattern
+Same endpoint repeatedly accessed
+High number of failed login attempts
+Traffic spike in short time
+📊 Example Pattern
+POST /login.php
+POST /login.php
+POST /login.php
+(repeated many times)
+⚖️ Attack vs Detection
+Phase	Activity
+Attack	Multiple login attempts
+Logs	Repeated POST requests
+Detection	High count from single source
+🔐 Security Recommendations
+Implement account lockout policy
+Add CAPTCHA protection
+Enforce strong passwords
+Monitor authentication logs
+Use SIEM alerts for detection
+🧠 Key Learnings
+Brute force attacks are easily visible in logs
+High request frequency is a strong indicator
+SIEM tools help detect abnormal patterns
+Even simple logs can reveal attacks
+Detection is possible without advanced tools
